@@ -1,9 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Chart } from 'chart.js/auto';
 import AdminNavbar from './AdminNavbar';
 
 function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
+
+  const userStatisticsChartRef = useRef(null);
+  const userRegistrationChartRef = useRef(null);
+  const bookStatisticsChartRef = useRef(null);
+  const publisherAuthorChartRef = useRef(null);
+  const bookAvailabilityChartRef = useRef(null);
+  const publisherPurchasesChartRef = useRef(null);
+  const userLoginCountChartRef = useRef(null);
 
   useEffect(() => {
     fetchDataAndCreateCharts();
@@ -12,25 +20,31 @@ function AdminDashboard() {
   async function fetchDataAndCreateCharts() {
     try {
       setIsLoading(true);
-      
-      // Fetch all data
+
+      // Fetch data
       const userStatsResponse = await fetch('https://online-book-website-backend-2.onrender.com/api/user-statistics');
       const userStats = await userStatsResponse.json();
+      console.log(userStats);
 
       const userRegistrationsResponse = await fetch('https://online-book-website-backend-2.onrender.com/api/user-registrations');
       const userRegistrations = await userRegistrationsResponse.json();
+      console.log(userRegistrations);
 
       const bookStatsResponse = await fetch('https://online-book-website-backend-2.onrender.com/api/book-statistics');
       const bookStats = await bookStatsResponse.json();
+      console.log(bookStats);
 
       const publisherAuthorStatsResponse = await fetch('https://online-book-website-backend-2.onrender.com/api/publisher-author-statistics');
       const publisherAuthorStats = await publisherAuthorStatsResponse.json();
+      console.log(publisherAuthorStats);
 
       const publisherPurchasesResponse = await fetch('https://online-book-website-backend-2.onrender.com/api/publisher-purchases');
-const publisherPurchases = await publisherPurchasesResponse.json();
+      const publisherPurchases = await publisherPurchasesResponse.json();
+      console.log(publisherPurchases);
 
-const userLoginCountResponse = await fetch('https://online-book-website-backend-2.onrender.com/api/user-login-count');
-const userLoginCount = await userLoginCountResponse.json();
+      const userLoginCountResponse = await fetch('https://online-book-website-backend-2.onrender.com/api/user-login-count');
+      const userLoginCount = await userLoginCountResponse.json();
+      console.log(userLoginCount);
 
       // Create charts
       createUserStatisticsChart(userStats);
@@ -39,7 +53,7 @@ const userLoginCount = await userLoginCountResponse.json();
       createPublisherAuthorChart(publisherAuthorStats);
       createBookAvailabilityChart(bookStats);
       createPublisherPurchasesChart(publisherPurchases);
-createUserLoginCountChart(userLoginCount);
+      createUserLoginCountChart(userLoginCount);
 
       setIsLoading(false);
     } catch (error) {
@@ -49,7 +63,7 @@ createUserLoginCountChart(userLoginCount);
   }
 
   function createUserStatisticsChart(data) {
-    new Chart(document.getElementById('userStatisticsChart'), {
+    new Chart(userStatisticsChartRef.current, {
       type: 'bar',
       data: {
         labels: ['Total Users', 'Admin Users', 'Regular Users'],
@@ -82,7 +96,7 @@ createUserLoginCountChart(userLoginCount);
   }
 
   function createUserRegistrationChart(data) {
-    new Chart(document.getElementById('userRegistrationChart'), {
+    new Chart(userRegistrationChartRef.current, {
       type: 'line',
       data: {
         labels: data.labels,
@@ -105,9 +119,8 @@ createUserLoginCountChart(userLoginCount);
     });
   }
 
-
   function createBookStatisticsChart(data) {
-    new Chart(document.getElementById('bookStatisticsChart'), {
+    new Chart(bookStatisticsChartRef.current, {
       type: 'pie',
       data: {
         labels: ['Available Books', 'Purchased Books'],
@@ -137,7 +150,7 @@ createUserLoginCountChart(userLoginCount);
   }
 
   function createPublisherAuthorChart(data) {
-    new Chart(document.getElementById('publisherAuthorChart'), {
+    new Chart(publisherAuthorChartRef.current, {
       type: 'doughnut',
       data: {
         labels: ['Publishers', 'Authors'],
@@ -168,8 +181,8 @@ createUserLoginCountChart(userLoginCount);
 
   function createBookAvailabilityChart(data) {
     const totalBooks = data.availableBooks + data.purchasedBooks;
-    
-    new Chart(document.getElementById('bookAvailabilityChart'), {
+
+    new Chart(bookAvailabilityChartRef.current, {
       type: 'bar',
       data: {
         labels: ['Total Books', 'Available Books', 'Purchased Books'],
@@ -209,8 +222,9 @@ createUserLoginCountChart(userLoginCount);
       }
     });
   }
+
   function createPublisherPurchasesChart(data) {
-    new Chart(document.getElementById('publisherPurchasesChart'), {
+    new Chart(publisherPurchasesChartRef.current, {
       type: 'bar',
       data: {
         labels: data.publishers,
@@ -242,9 +256,9 @@ createUserLoginCountChart(userLoginCount);
       }
     });
   }
-  
+
   function createUserLoginCountChart(data) {
-    new Chart(document.getElementById('userLoginCountChart'), {
+    new Chart(userLoginCountChartRef.current, {
       type: 'bar',
       data: {
         labels: data.usernames,
@@ -282,44 +296,33 @@ createUserLoginCountChart(userLoginCount);
   }
 
   return (
-   
     <div>
-       <AdminNavbar />
+      <AdminNavbar />
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-      
         <div style={{ width: '50%', padding: '10px' }}>
-          <canvas id="userStatisticsChart"></canvas>
+          <canvas ref={userStatisticsChartRef} id="userStatisticsChart"></canvas>
         </div>
         <div style={{ width: '50%', padding: '10px' }}>
-          <canvas id="userRegistrationChart"></canvas>
+          <canvas ref={userRegistrationChartRef} id="userRegistrationChart"></canvas>
         </div>
         <div style={{ width: '50%', padding: '10px' }}>
-          <canvas id="bookAvailabilityChart"></canvas>
+          <canvas ref={bookAvailabilityChartRef} id="bookAvailabilityChart"></canvas>
         </div>
         <div style={{ width: '35%', padding: '10px' }}>
-          <canvas id="bookStatisticsChart"></canvas>
+          <canvas ref={bookStatisticsChartRef} id="bookStatisticsChart"></canvas>
         </div>
-        
-        
         <div style={{ width: '35%', padding: '10px' }}>
-          <canvas id="publisherAuthorChart"></canvas>
+          <canvas ref={publisherAuthorChartRef} id="publisherAuthorChart"></canvas>
         </div>
         <div style={{ width: '50%', padding: '10px' }}>
-        <canvas id="publisherPurchasesChart"></canvas>
-      </div>
-      <div style={{ width: '50%', padding: '10px' }}>
-        <canvas id="userLoginCountChart"></canvas>
-      </div>
+          <canvas ref={publisherPurchasesChartRef} id="publisherPurchasesChart"></canvas>
+        </div>
+        <div style={{ width: '50%', padding: '10px' }}>
+          <canvas ref={userLoginCountChartRef} id="userLoginCountChart"></canvas>
+        </div>
       </div>
     </div>
   );
 }
 
-export default AdminDashboard;                         
-                          
-
-
-
-
-
-
+export default AdminDashboard;
